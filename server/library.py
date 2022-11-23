@@ -6,6 +6,7 @@ def checkUser(username, password):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM accounts WHERE username = ? AND password = ?", (username, password,))
     data = cursor.fetchall()
+    conn.close()
 
     if len(data) == 0:
         return False
@@ -13,15 +14,14 @@ def checkUser(username, password):
     return True
 
 
-def get(user):
+def get_phone_host(user):
     conn = sql.connect("database.db")
     cursor = conn.cursor()
     cursor.execute("SELECT phone FROM accounts WHERE username=?", (user,))
     data = cursor.fetchone()
+    conn.close()
+    
     if data is None:
         return None
 
-    data = cursor.fetchall()
-
-    conn.close()
-    return data
+    return data[0]

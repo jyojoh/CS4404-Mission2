@@ -4,15 +4,28 @@ import database as init
 import library as db
 import random
 import string
+import socket
 
+# DB
 init.initDatabase()
 
+# App
 app = Flask(__name__)
 app.secret_key = "twofaserver"
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 twoFactorCode = None
+
+def messagePhone(phone_host, message):
+    host = phone_host
+    port = 65000
+
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.connect((host, port))
+
+    server.sendall(str.encode(message))
+
 
 @app.get("/")
 def index_get():
@@ -29,8 +42,8 @@ def index_post():
 
     #Generate 2fa code, send to phone, and prompt for code
     twoFactorCode = "".join(random.choices(string.digits, k=6))
-    ### Send twoFactorCode to phone here ###
-    print("Generated 2FA code: " + twoFactorCode + " for user " + username)
+    messagePhone(db.get_phone_host(username), twoFactorCode)
+    print("Generated 2FA code: " + twoFactorCode + " for user: " + username)
     return render_template("twofactor.html")
 
 @app.post("/twofactor")
