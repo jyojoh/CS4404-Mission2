@@ -20,6 +20,7 @@ def index_get():
 
 @app.post("/login")
 def index_post():
+    global twoFactorCode
     username = str(request.values.get("user"))
     password = str(request.values.get("pass"))
 
@@ -34,6 +35,7 @@ def index_post():
 
 @app.post("/twofactor")
 def twofactor_post():
+    global twoFactorCode
     #Check if code matches generated 2fa code
     code = str(request.values.get("code"))
     if code == twoFactorCode:
